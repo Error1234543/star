@@ -1,13 +1,15 @@
 services:
-  - type: worker
+  - type: web
     name: jatx-telegram-bot
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python bot.py
     envVars:
       - key: BOT_TOKEN
-        sync: false          # Render dashboard mein manually daalo
+        sync: false
       - key: OWNER_ID
         value: "8226637107"
       - key: OWNER_USERNAME
-        value: "@YourUsername"  # Apna username yahan daalo
+        value: "@Jatxchatbot"
+      - key: WEBHOOK_URL
+        sync: false   # Render deploy hone ke baad URL yahan daalo
