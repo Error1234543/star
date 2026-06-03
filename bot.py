@@ -1,10 +1,36 @@
+import asyncio
+
+try:
+    asyncio.get_event_loop()
+except RuntimeError:
+    asyncio.set_event_loop(asyncio.new_event_loop())
+
+from flask import Flask
+from threading import Thread
+import os
+
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-API_ID = 12345
-API_HASH = "YOUR_API_HASH"
-BOT_TOKEN = "YOUR_BOT_TOKEN"
+# ENV VARIABLES
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+# Flask Web Server (Render Web Service)
+web = Flask(__name__)
+
+@web.route("/")
+def home():
+    return "Bot Running Successfully!"
+
+def run_web():
+    web.run(
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 10000))
+    )
+
+# Pyrogram Bot
 app = Client(
     "batch_bot",
     api_id=API_ID,
@@ -16,22 +42,12 @@ app = Client(
 async def start(_, message):
 
     buttons = InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton(
-                "🩺 NEET Batch 1",
-                callback_data="batch1"
-            )
-        ],
-        [
-            InlineKeyboardButton(
-                "🩺 NEET Batch 2",
-                callback_data="batch2"
-            )
-        ]
+        [InlineKeyboardButton("🩺 NEET Batch 1", callback_data="batch1")],
+        [InlineKeyboardButton("🩺 NEET Batch 2", callback_data="batch2")]
     ])
 
     await message.reply_text(
-        "Select Your Batch 👇",
+        "📚 Select Your Batch 👇",
         reply_markup=buttons
     )
 
@@ -56,4 +72,7 @@ async def callbacks(_, query):
             "Admin payment verify karke access dega."
         )
 
-app.run()
+if __name__ == "__main__":
+    Thread(target=run_web).start()
+    print("Bot Started...")
+    app.run()
